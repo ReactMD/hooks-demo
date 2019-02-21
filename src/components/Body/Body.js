@@ -6,33 +6,46 @@ import useInterval from "../../hooks/useInterval";
 
 export default memo(() => {
   const [snowflakes, setSnowflakes] = useState([]);
-  const [intTime, setIntTime] = useState(5000);
+  const [numSnowflakes, setNumSnowflakes] = useState(10);
 
-  useInterval(() => {
-    setSnowflakes(snowflakes.slice(5));
-    setIntTime(intTime - 500);
-  }, intTime);
+  useInterval(
+    () => {
+      if (snowflakes.length) {
+        setSnowflakes(snowflakes.slice(50));
+      }
+    },
+    snowflakes.length > 0 ? 10000 : null
+  );
+
+  const setSnowflakeNum = e => {
+    const val = parseInt(e.target.value, 10);
+    if (val > 0) {
+      setNumSnowflakes(val);
+    }
+  };
 
   const addSnowflake = () => {
     setSnowflakes([
       ...snowflakes,
-      {
+      ...Array.from(Array(numSnowflakes).keys()).map(_ => ({
         id: uuid(),
-        size: Math.floor(Math.random() * 50)
-      }
+        size: Math.floor(Math.random() * 100)
+      }))
     ]);
-    if (intTime < 5000) {
-      setIntTime(intTime + 250);
-    }
   };
 
   return (
     <div className="body">
       <Snow snowflakes={snowflakes} />
-      <span>Click to snow!</span>
       <div onClick={addSnowflake} className="snowflake-button">
         ❅
       </div>
+      <input
+        className="snowflake-input"
+        value={numSnowflakes}
+        onChange={setSnowflakeNum}
+        type="number"
+      />
     </div>
   );
 });
